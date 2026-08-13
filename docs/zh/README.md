@@ -1,4 +1,4 @@
-# Full Stack FastAPI 模板
+# Intelligence_analysis 
 
 **语言 / Language: [English](../en/README.md) | [中文](README.md)**
 
@@ -28,99 +28,51 @@
 - 🚢 提供基于 Docker Compose 的部署说明，包括如何配置前端 Traefik 代理以自动处理 HTTPS 证书。
 - 🏭 基于 GitHub Actions 的 CI（持续集成）和 CD（持续部署）。
 
+
 ### 控制台登录
 
-[![Dashboard login screenshot](../../img/login.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
+![Dashboard login screenshot](../../img/login.png)
 ### 控制台 - 管理员
 
-[![Admin dashboard screenshot](../../img/dashboard.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
+![Admin dashboard screenshot](../../img/dashboard.png)
 ### 控制台 - 条目
 
-[![Items dashboard screenshot](../../img/dashboard-items.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
+![Items dashboard screenshot](../../img/dashboard-items.png)
 ### 控制台 - 深色模式
 
-[![Dark mode dashboard screenshot](../../img/dashboard-dark.png)](https://github.com/fastapi/full-stack-fastapi-template)
-
+![Dark mode dashboard screenshot](../../img/dashboard-dark.png)
 ### 交互式 API 文档
 
-[![API docs](../../img/docs.png)](https://github.com/fastapi/full-stack-fastapi-template)
+![API docs](../../img/docs.png)
+## TODO
 
-## 如何使用
+这是我们的项目开发周期路线[TODO.md](./doc/TODO.md)
 
-你可以**直接 fork 或 clone** 这个仓库，按原样使用。
+## 产品路线图
 
-✨ 它就是能直接用。✨
+完整的项目设计流程以及项目初展示[roadmap.md](./docs/roadmap.md)
 
-### 如何使用私有仓库
+## 架构图
 
-如果你想拥有一个私有仓库，GitHub 不允许你直接 fork 它，因为 fork 不允许更改可见性。
+系统架构设计图[structure.md](./docs/structure.md)
 
-但你可以这样做：
+## 后端开发
 
-- 创建一个新的 GitHub 仓库，例如 `my-full-stack`。
-- 手动克隆本仓库，将名称设置为你想使用的项目名，例如 `my-full-stack`：
+后端文档：[backend/README.md](./backend/README.md)。
 
-```bash
-git clone git@github.com:fastapi/full-stack-fastapi-template.git my-full-stack
-```
+## 前端开发
 
-- 进入新目录：
+前端文档：[frontend/README.md](./frontend/README.md)。
 
-```bash
-cd my-full-stack
-```
+## 部署
 
-- 将新的 origin 设置为你自己的仓库地址（可从 GitHub 界面复制），例如：
+部署文档：[deployment.md](./deployment.md)。
 
-```bash
-git remote set-url origin git@github.com:octocat/my-full-stack.git
-```
+## 开发
 
-- 将本仓库添加为另一个 "remote"，以便你以后获取更新：
+通用开发文档：[development.md](./development.md)。
 
-```bash
-git remote add upstream git@github.com:fastapi/full-stack-fastapi-template.git
-```
-
-- 将代码推送到你的新仓库：
-
-```bash
-git push -u origin master
-```
-
-### 从原始模板更新
-
-克隆仓库并进行修改之后，你可能想从这个原始模板中获取最新的更改。
-
-- 确保你已经将原始仓库添加为 remote，可以用以下命令检查：
-
-```bash
-git remote -v
-
-origin    git@github.com:octocat/my-full-stack.git (fetch)
-origin    git@github.com:octocat/my-full-stack.git (push)
-upstream    git@github.com:fastapi/full-stack-fastapi-template.git (fetch)
-upstream    git@github.com:fastapi/full-stack-fastapi-template.git (push)
-```
-
-- 拉取最新更改但不合并：
-
-```bash
-git pull --no-commit upstream master
-```
-
-这会下载模板的最新更改但不提交，这样你可以在提交前检查一切是否正常。
-
-- 如果有冲突，在编辑器中解决它们。
-
-- 完成后，提交更改：
-
-```bash
-git merge --continue
-```
+其中包括使用 Docker Compose、自定义本地域名、`.env` 配置等内容。
 
 ### 配置
 
@@ -208,27 +160,11 @@ Copier 会向你询问一些数据，你可能希望在生成项目之前就准�
 - `postgres_password`：（默认值：`"changethis"`）PostgreSQL 数据库的密码，存储在 .env 中，你可以用上面的方法生成一个。
 - `sentry_dsn`：（默认值：""）如果你使用 Sentry，这里是它的 DSN，你可以稍后设置。
 
-## 后端开发
+## 🙏 感谢
+该项目深受以下项目灵感启发:
 
-后端文档：[backend/README.md](./backend/README.md)。
-
-## 前端开发
-
-前端文档：[frontend/README.md](./frontend/README.md)。
-
-## 部署
-
-部署文档：[deployment.md](./deployment.md)。
-
-## 开发
-
-通用开发文档：[development.md](./development.md)。
-
-其中包括使用 Docker Compose、自定义本地域名、`.env` 配置等内容。
-
-## 发布说明
-
-请查看 [release-notes.md](./release-notes.md) 文件。
+- [full-stack-fastapi-template](https://github.com/fastapi/full-stack-fastapi-template.git) by @tiangolo
+- [FastAPI Best Practices](https://github.com/zhanymkanov/fastapi-best-practices.git) by @zhanymkanov
 
 ## 许可证
 
