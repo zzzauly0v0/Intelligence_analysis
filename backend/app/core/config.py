@@ -7,7 +7,6 @@ from pydantic import (
     BeforeValidator,
     EmailStr,
     HttpUrl,
-    PostgresDsn,
     computed_field,
     model_validator,
 )
@@ -33,6 +32,8 @@ class Settings(BaseSettings):
     SECRET_KEY: str = secrets.token_urlsafe(32)
     # 60 minutes * 24 hours * 8 days = 8 days
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
+    # Lifetime of a login session (`sessions` row); rotated on every refresh.
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 30
     FRONTEND_HOST: str = "http://localhost:5173"
     ENVIRONMENT: Literal["local", "staging", "production"] = "local"
 
@@ -47,6 +48,55 @@ class Settings(BaseSettings):
             self.FRONTEND_HOST
         ]
 
+    """ Logging """
+
+    LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"] = "INFO"
+
+    """ Middleware """
+
+    # Header carrying the request ID, both inbound (trusted, sanitized) and out.
+    REQUEST_ID_HEADER: str = "X-Request-ID"
+
+    # Blanket per-IP cap, counted per worker process. See RateLimitMiddleware.
+    RATE_LIMIT_ENABLED: bool = True
+    RATE_LIMIT_REQUESTS: int = 300
+    RATE_LIMIT_WINDOW_SECONDS: int = 60
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def rate_limit_exempt_paths(self) -> list[str]:
+        """Prefixes the rate limit ignores: docs, schema and health probes.
+
+        Uptime checks poll far above any sane per-IP budget, and a throttled
+        ``/docs`` is just an annoyance -- neither is worth protecting.
+        """
+        return [
+            "/docs",
+            "/redoc",
+            f"{self.API_V1_STR}/openapi.json",
+            f"{self.API_V1_STR}/utils/health-check",
+        ]
+
+    # Signed-cookie sessions, off by default: auth is stateless JWT today. Turn
+    # on when a flow needs server-side state across redirects (OAuth `state`).
+    SESSION_ENABLED: bool = False
+    SESSION_COOKIE_NAME: str = "session"
+    SESSION_MAX_AGE_SECONDS: int = 60 * 60 * 24 * 14  # 14 days
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def session_https_only(self) -> bool:
+        """Mark the session cookie ``Secure`` everywhere but local http dev."""
+        return self.ENVIRONMENT != "local"
+
+    """ Reserved integrations """
+
+    # Unset until a Redis-backed component lands (cache, shared rate limit,
+    # pub/sub). The app lifespan connects it when this is set.
+    REDIS_URL: str | None = None
+
+    DB_ECHO: bool = False  # Set DB_ECHO=true to log SQL queries (latency + log-noise drain by default)
+
     PROJECT_NAME: str
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str
@@ -57,15 +107,38 @@ class Settings(BaseSettings):
 
     @computed_field  # type: ignore[prop-decorator]
     @property
-    def SQLALCHEMY_DATABASE_URI(self) -> PostgresDsn:
-        return PostgresDsn.build(
-            scheme="postgresql+psycopg",
-            username=self.POSTGRES_USER,
-            password=self.POSTGRES_PASSWORD,
-            host=self.POSTGRES_SERVER,
-            port=self.POSTGRES_PORT,
-            path=self.POSTGRES_DB,
+    def DATABASE_URL(self) -> str:
+        """Build async PostgreSQL connection URL.
+
+        psycopg 3 serves both the async engine and Alembic, so no separate
+        asyncpg driver is needed.
+        """
+        return (
+            f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
         )
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def DATABASE_URL_SYNC(self) -> str:
+        """Build sync PostgreSQL connection URL (for Alembic)."""
+        return (
+            f"postgresql+psycopg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def DATABASE_DSN(self) -> str:
+        """Driverless DSN for libraries that parse it themselves (e.g. asyncpg)."""
+        return (
+            f"postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}"
+            f"@{self.POSTGRES_SERVER}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}"
+        )
+
+    DB_POOL_SIZE: int = 5
+    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_TIMEOUT: int = 30
 
     SMTP_TLS: bool = True
     SMTP_SSL: bool = False
