@@ -8,6 +8,7 @@ This directory holds bilingual (English / Chinese) copies of the project's docum
 | --- | --- | --- |
 | Project overview / 项目概览 | [en/README.md](en/README.md) | [zh/README.md](zh/README.md) |
 | Contributing / 贡献指南 | [en/CONTRIBUTING.md](en/CONTRIBUTING.md) | [zh/CONTRIBUTING.md](zh/CONTRIBUTING.md) |
+| Architecture / 架构 | [en/architecture.md](en/architecture.md) | [zh/architecture.md](zh/architecture.md) |
 | Development / 开发指南 | [en/development.md](en/development.md) | [zh/development.md](zh/development.md) |
 | Deployment / 部署指南 | [en/deployment.md](en/deployment.md) | [zh/deployment.md](zh/deployment.md) |
 | Backend / 后端 | [en/backend/README.md](en/backend/README.md) | [zh/backend/README.md](zh/backend/README.md) |
