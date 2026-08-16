@@ -28,6 +28,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-install-workspace --package app
 
 COPY ./backend/scripts /app/backend/scripts
+COPY ./backend/bootstrap /app/backend/bootstrap
+COPY ./backend/alembic /app/backend/alembic
 
 COPY ./backend/pyproject.toml ./backend/alembic.ini /app/backend/
 

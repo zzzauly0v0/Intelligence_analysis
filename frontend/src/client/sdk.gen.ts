@@ -128,7 +128,7 @@ export class LoginService {
     public static loginAccessToken(data: LoginLoginAccessTokenData): CancelablePromise<LoginLoginAccessTokenResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/login/access-token',
+            url: '/api/v1/users/login/access-token',
             formData: data.formData,
             mediaType: 'application/x-www-form-urlencoded',
             errors: {
@@ -146,7 +146,7 @@ export class LoginService {
     public static testToken(): CancelablePromise<LoginTestTokenResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/login/test-token'
+            url: '/api/v1/users/login/test-token'
         });
     }
     
@@ -161,7 +161,7 @@ export class LoginService {
     public static recoverPassword(data: LoginRecoverPasswordData): CancelablePromise<LoginRecoverPasswordResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/password-recovery/{email}',
+            url: '/api/v1/users/password-recovery/{email}',
             path: {
                 email: data.email
             },
@@ -182,7 +182,7 @@ export class LoginService {
     public static resetPassword(data: LoginResetPasswordData): CancelablePromise<LoginResetPasswordResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/reset-password/',
+            url: '/api/v1/users/reset-password',
             body: data.requestBody,
             mediaType: 'application/json',
             errors: {
@@ -202,7 +202,7 @@ export class LoginService {
     public static recoverPasswordHtmlContent(data: LoginRecoverPasswordHtmlContentData): CancelablePromise<LoginRecoverPasswordHtmlContentResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/password-recovery-html-content/{email}',
+            url: '/api/v1/users/password-recovery/{email}',
             path: {
                 email: data.email
             },
@@ -225,7 +225,7 @@ export class PrivateService {
     public static createUser(data: PrivateCreateUserData): CancelablePromise<PrivateCreateUserResponse> {
         return __request(OpenAPI, {
             method: 'POST',
-            url: '/api/v1/private/users/',
+            url: '/api/v1/users/',
             body: data.requestBody,
             mediaType: 'application/json',
             errors: {

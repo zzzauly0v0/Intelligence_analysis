@@ -19,6 +19,8 @@ dependencies = [
     "sentry-sdk[fastapi]>=2.63.0,<3.0.0",
     "pyjwt<3.0.0,>=2.13.0",
     "pwdlib[argon2,bcrypt]>=0.3.0",
+    # Cookie signing for Starlette's SessionMiddleware (SESSION_ENABLED).
+    "itsdangerous<3.0.0,>=2.2.0",
 ]
 
 [dependency-groups]
@@ -37,6 +39,11 @@ build-backend = "hatchling.build"
 [tool.mypy]
 strict = true
 exclude = ["venv", ".venv", "alembic"]
+
+# asyncpg is only used by app/db/todo_pool.py and is not installed yet.
+[[tool.mypy.overrides]]
+module = ["asyncpg.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
 target-version = "py314"
