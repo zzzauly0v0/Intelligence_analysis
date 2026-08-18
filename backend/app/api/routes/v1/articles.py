@@ -7,6 +7,7 @@ Three read-only endpoints:
   GET /articles/history    — paginated history with date/group/site/search filters
 """
 
+from datetime import date
 from typing import Any
 
 from fastapi import APIRouter, Query
@@ -38,28 +39,18 @@ async def get_history(
     service: ArticleServiceDep,
     group_type: str | None = Query(default=None),
     site_name: str | None = Query(default=None),
-    date_from: str | None = Query(default=None, description="YYYY-MM-DD"),
-    date_to: str | None = Query(default=None, description="YYYY-MM-DD"),
+    date_from: date | None = Query(default=None, description="YYYY-MM-DD"),
+    date_to: date | None = Query(default=None, description="YYYY-MM-DD"),
     search: str | None = Query(default=None, description="标题/站点名关键词"),
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=50, ge=1, le=200),
 ) -> Any:
     """分页查询历史文章，支持按分组、站点、日期范围、关键词过滤。"""
-    from datetime import date
-
-    def _parse_date(s: str | None) -> date | None:
-        if not s:
-            return None
-        try:
-            return date.fromisoformat(s)
-        except ValueError as exc:
-            raise BadRequestError(f"Invalid date format: {s!r}. Expected YYYY-MM-DD") from exc
-
     query = ArticleQuery(
         group_type=group_type,
         site_name=site_name,
-        date_from=_parse_date(date_from),
-        date_to=_parse_date(date_to),
+        date_from=date_from,
+        date_to=date_to,
         search=search,
         skip=skip,
         limit=limit,

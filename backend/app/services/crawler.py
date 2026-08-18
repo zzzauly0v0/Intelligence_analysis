@@ -15,13 +15,12 @@ Usage (from src/run_monitor.py):
     asyncio.run(save_hits_to_db(hits, summaries))
 """
 
-import asyncio
 import logging
 from datetime import date
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.session import get_db_session
+from app.db.session import get_worker_db_context
 from app.repository import article as article_repo
 
 logger = logging.getLogger(__name__)
@@ -79,24 +78,16 @@ async def save_hits_to_db(
 ) -> int:
     """Persist a batch of scraper hits to the articles table.
 
-    Opens its own DB session (uses the same ``get_db_session`` factory the
-    FastAPI request scope uses, but manages commit/rollback directly since
-    there is no request context here).
+    Uses ``get_worker_db_context`` — a short-lived NullPool session that
+    auto-commits on success and rolls back on error, designed for background
+    workers that run outside a FastAPI request context.
 
     Returns the number of rows successfully upserted.
     """
     if not hits:
         return 0
 
-    async for db in get_db_session():
-        try:
-            count = await _save(db, hits, summaries)
-            await db.commit()
-            logger.info("Saved %d articles to database", count)
-            return count
-        except Exception:
-            await db.rollback()
-            logger.exception("Failed to save articles to database")
-            raise
-
-    return 0  # unreachable, satisfies type checker
+    async with get_worker_db_context() as db:
+        count = await _save(db, hits, summaries)
+        logger.info("Saved %d articles to database", count)
+        return count

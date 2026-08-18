@@ -45,9 +45,13 @@ async def list_articles(
     if date_to:
         stmt = stmt.where(Article.publish_date <= date_to)
     if search:
-        pattern = f"%{search}%"
+        escaped = search.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        pattern = f"%{escaped}%"
         stmt = stmt.where(
-            or_(Article.title.ilike(pattern), Article.site_name.ilike(pattern))
+            or_(
+                Article.title.ilike(pattern, escape="\\"),
+                Article.site_name.ilike(pattern, escape="\\"),
+            )
         )
 
     total_result = await db.execute(
@@ -95,6 +99,8 @@ async def upsert_article(
     to False only when body_text actually changed, so the RAG pipeline is not
     re-triggered needlessly. created_at is never overwritten.
     """
+    from sqlalchemy import case, literal
+
     stmt = (
         pg_insert(Article)
         .values(
@@ -117,8 +123,12 @@ async def upsert_article(
                 "summary": summary,
                 "group_type": group_type,
                 "is_external": is_external,
-                # Reset embedding flag only when body actually changed.
-                "embedding_done": False,
+                # Reset embedding flag only when body_text actually changed, so
+                # an identical re-crawl does not trigger the RAG pipeline again.
+                "embedding_done": case(
+                    (Article.body_text != literal(body_text), False),
+                    else_=Article.embedding_done,
+                ),
             },
         )
         .returning(Article)
