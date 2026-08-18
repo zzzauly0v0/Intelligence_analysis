@@ -5,7 +5,8 @@ for Alembic and string-based relationships (``User.sessions``) can resolve.
 """
 
 from app.db.base import Base
+from app.db.models.article import Article
 from app.db.models.session import Session
 from app.db.models.user import User, UserRole
 
-__all__ = ["Base", "Session", "User", "UserRole"]
+__all__ = ["Article", "Base", "Session", "User", "UserRole"]

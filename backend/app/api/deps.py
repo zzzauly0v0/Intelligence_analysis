@@ -20,6 +20,7 @@ from app.core.exceptions import AuthenticationError, AuthorizationError, NotFoun
 from app.core.security import TokenType, decode_token
 from app.db.models.user import User, UserRole
 from app.db.session import get_db_session
+from app.services.article import ArticleService
 from app.services.user import UserService
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -39,6 +40,13 @@ def get_user_service(db: SessionDep) -> UserService:
 
 
 UserServiceDep = Annotated[UserService, Depends(get_user_service)]
+
+
+def get_article_service(db: SessionDep) -> ArticleService:
+    return ArticleService(db)
+
+
+ArticleServiceDep = Annotated[ArticleService, Depends(get_article_service)]
 
 """ Authentication """
 
