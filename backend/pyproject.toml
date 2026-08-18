@@ -21,6 +21,14 @@ dependencies = [
     "pwdlib[argon2,bcrypt]>=0.3.0",
     # Cookie signing for Starlette's SessionMiddleware (SESSION_ENABLED).
     "itsdangerous<3.0.0,>=2.2.0",
+    "selenium",
+    "undetected-chromedriver",
+    "pyvirtualdisplay",
+    "beautifulsoup4",
+    "pymupdf",
+    "openpyxl",
+    "python-dotenv",
+    "openai",
 ]
 
 [dependency-groups]
