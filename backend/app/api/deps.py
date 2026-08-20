@@ -21,6 +21,7 @@ from app.core.security import TokenType, decode_token
 from app.db.models.user import User, UserRole
 from app.db.session import get_db_session
 from app.services.article import ArticleService
+from app.services.rag import RagService
 from app.services.user import UserService
 
 reusable_oauth2 = OAuth2PasswordBearer(
@@ -47,6 +48,13 @@ def get_article_service(db: SessionDep) -> ArticleService:
 
 
 ArticleServiceDep = Annotated[ArticleService, Depends(get_article_service)]
+
+
+def get_rag_service(db: SessionDep) -> RagService:
+    return RagService(db)
+
+
+RagServiceDep = Annotated[RagService, Depends(get_rag_service)]
 
 """ Authentication """
 
