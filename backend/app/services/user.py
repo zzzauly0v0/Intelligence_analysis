@@ -66,10 +66,13 @@ class UserService:
 
     """ Queries """
 
-    async def get(self, user_id: UUID) -> User:
+    async def get_by_id(self, user_id: UUID) -> User:
         user = await user_repo.get_by_id(self.db, user_id)
-        if user is None:
-            raise NotFoundError("User not found", details={"user_id": str(user_id)})
+        if not user:
+            raise NotFoundError(
+                message="User not found",
+                details={"user_id": user_id},
+            )
         return user
 
     async def get_by_email(self, email: str) -> User | None:
@@ -122,7 +125,7 @@ class UserService:
 
     async def update(self, user_id: UUID, user_in: UserUpdate) -> User:
         """Admin-side update. Setting a password signs the account out everywhere."""
-        user = await self.get(user_id)
+        user = await self.get_by_id(user_id)
         update_data = self._writable_fields(user_in)
 
         if "email" in update_data:
@@ -160,7 +163,7 @@ class UserService:
         await user_repo.deactivate_all_user_sessions(self.db, user.id)
 
     async def delete(self, user_id: UUID) -> None:
-        user = await self.get(user_id)
+        user = await self.get_by_id(user_id)
         await user_repo.delete(self.db, user)
 
     """ Authentication """
@@ -232,7 +235,7 @@ class UserService:
             await user_repo.deactivate_session(self.db, login_session)
             raise AuthenticationError("Refresh token is invalid or has expired")
 
-        user = await self.get(login_session.user_id)
+        user = await self.get_by_id(login_session.user_id)
         if not user.is_active:
             await user_repo.deactivate_session(self.db, login_session)
             raise AuthenticationError("Inactive user")
@@ -293,7 +296,7 @@ class UserService:
         except ValueError as exc:
             raise AuthenticationError("Reset link is invalid or has expired") from exc
 
-        user = await self.get(user_id)
+        user = await self.get_by_id(user_id)
         if not user.is_active:
             raise AuthenticationError("Inactive user")
 

@@ -186,7 +186,7 @@ async def read_user_by_id(
     """Get a specific user; non-admins may only read themselves."""
     if user_id != current_user.id and not is_admin(current_user):
         raise AuthorizationError("The user doesn't have enough privileges")
-    return await service.get(user_id)
+    return await service.get_by_id(user_id)
 
 
 @router.patch(

@@ -66,7 +66,7 @@ async def get_current_user(service: UserServiceDep, token: TokenDep) -> User:
         raise AuthenticationError("Could not validate credentials") from exc
 
     try:
-        user = await service.get(user_id)
+        user = await service.get_by_id(user_id)
     except NotFoundError as exc:
         # A token for a deleted account is a credentials problem, not a 404.
         raise AuthenticationError("Could not validate credentials") from exc

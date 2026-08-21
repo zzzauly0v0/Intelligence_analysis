@@ -41,7 +41,11 @@ def _is_websocket(conn: HTTPConnection) -> bool:
 
 
 def _error_body(*, detail: str, code: str, details: dict[str, Any] | None) -> Any:
-    return ErrorResponse(detail=detail, code=code, details=details).model_dump()
+    # mode="json" so non-primitive values in `details` (UUID, datetime, ...) become
+    # JSON-serializable instead of crashing JSONResponse.render with a raw TypeError.
+    return ErrorResponse(detail=detail, code=code, details=details).model_dump(
+        mode="json"
+    )
 
 
 async def app_exception_handler(

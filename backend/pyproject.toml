@@ -44,6 +44,12 @@ dev = [
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# -ra: summarize non-passing outcomes; strict flags turn typo'd markers and bad
+# config into errors instead of silently-skipped tests.
+addopts = ["-ra", "--strict-markers", "--strict-config"]
+
 [tool.mypy]
 strict = true
 exclude = ["venv", ".venv", "alembic"]
