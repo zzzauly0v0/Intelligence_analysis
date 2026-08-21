@@ -13,26 +13,22 @@ import logging
 
 import numpy as np
 
+from app.core.config import settings
+
 logger = logging.getLogger(__name__)
 
 # BGE-m3 dense 向量维度。建 Milvus collection 时要用到，故设为单一出处的常量。
 EMBED_DIM = 1024
 
-# 默认模型名。TODO(后续): 迁移到 settings.RAG_EMBED_MODEL 统一配置。
-_MODEL_NAME = "BAAI/bge-m3"
-
 
 class Embedder:
     """BGE-m3 嵌入模型封装。构造即加载模型（慢），故应只实例化一次。"""
 
-    def __init__(self, model_name: str = _MODEL_NAME) -> None:
+    def __init__(self, model_name: str = settings.RAG_EMBED_MODEL) -> None:
         from FlagEmbedding import BGEM3FlagModel
         from modelscope import snapshot_download
 
-        # 从 ModelScope（国内源）下载/定位模型，拿到本地目录后再交给 FlagEmbedding，
-        # 从本地路径加载，绕开 HuggingFace 的连接问题。已缓存则 snapshot_download 秒回。
         logger.info("正在从 ModelScope 定位 BGE-m3 模型 ...")
-        # 跳过仓库里的 ONNX 权重（约 2GB）：FlagEmbedding 用 PyTorch 权重，ONNX 用不上。
         model_dir = snapshot_download(model_name, ignore_file_pattern=["onnx"])
         logger.info("正在加载 BGE-m3 模型: %s", model_dir)
         self._model = BGEM3FlagModel(model_dir, use_fp16=False)

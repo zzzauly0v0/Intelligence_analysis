@@ -11,20 +11,19 @@ from typing import Any
 
 from pymilvus import DataType, MilvusClient
 
+from app.core.config import settings
 from app.services.rag.embedding import EMBED_DIM
 
 logger = logging.getLogger(__name__)
-
-# TODO(后续): 迁移到 settings.MILVUS_DB_PATH / settings.RAG_COLLECTION 统一配置。
-_DB_PATH = "./milvus_rag.db"
-_COLLECTION = "article_chunks"
 
 
 class VectorStore:
     """Milvus Lite 中「文章块」集合的封装。"""
 
     def __init__(
-        self, db_path: str = _DB_PATH, collection_name: str = _COLLECTION
+        self,
+        db_path: str = settings.RAG_MILVUS_DB_PATH,
+        collection_name: str = settings.RAG_COLLECTION,
     ) -> None:
         self._client = MilvusClient(uri=db_path)
         self._collection = collection_name
