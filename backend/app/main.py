@@ -62,6 +62,24 @@ async def _close_todo_pool() -> None:
     await close_todo_pool()
 
 
+def _preload_rag() -> None:
+    """启动时预热 RAG：加载嵌入模型、确保向量库集合存在。
+
+    预热是优化、不是硬依赖：任何失败都只记警告、不阻断启动，首个 /rag 请求
+    会再触发懒加载。由 ``settings.RAG_PRELOAD`` 控制，默认关闭，避免模型尚未
+    下载时每次启动都去拉取。
+    """
+    try:
+        from app.services.rag.embedding import get_embedder
+        from app.services.rag.vectorstore import VectorStore
+
+        get_embedder()
+        VectorStore().ensure_collection()
+        logger.info("RAG 预热完成")
+    except Exception as exc:
+        logger.warning("RAG 预热跳过（模型可能未就绪）: %r", exc)
+
+
 @asynccontextmanager
 async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     """Own the process-wide resources: acquire before serving, release after.
@@ -86,7 +104,9 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
     assert_event_loop_supported()
     await _open_todo_pool()
     # 1. Redis        -- reserved, see docstring
-    # 2. RAG          -- reserved, see docstring
+    # 2. RAG          -- 预热嵌入模型 + 向量库（可选，由 RAG_PRELOAD 控制）
+    if settings.RAG_PRELOAD:
+        _preload_rag()
     # 3. Bot polling  -- reserved, see docstring
 
     try:

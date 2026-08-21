@@ -97,6 +97,22 @@ class Settings(BaseSettings):
 
     DB_ECHO: bool = False  # Set DB_ECHO=true to log SQL queries (latency + log-noise drain by default)
 
+    """ RAG (语义检索) """
+
+    # 嵌入模型（ModelScope 上的模型 id）。向量维度由模型决定，见 embedding.EMBED_DIM。
+    RAG_EMBED_MODEL: str = "BAAI/bge-m3"
+    # Milvus Lite 本地文件路径与集合名。
+    RAG_MILVUS_DB_PATH: str = "./milvus_rag.db"
+    RAG_COLLECTION: str = "article_chunks"
+    # 切块参数与检索返回条数。
+    RAG_CHUNK_SIZE: int = 500
+    RAG_CHUNK_OVERLAP: int = 100
+    RAG_TOP_K: int = 5
+    # 嵌入 worker 每批处理的文章数。
+    RAG_INDEX_BATCH: int = 100
+    # 是否在应用启动时预热 RAG（加载模型 + 建集合）。默认关：模型未下载时不拖慢启动。
+    RAG_PRELOAD: bool = False
+
     PROJECT_NAME: str
     SENTRY_DSN: HttpUrl | None = None
     POSTGRES_SERVER: str
